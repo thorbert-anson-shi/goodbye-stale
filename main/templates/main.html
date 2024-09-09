@@ -28,7 +28,7 @@
         </div>
         <div>
           <h1 class="font-bold">Ingredients</h1>
-          <ul class="list-disc">
+          <ul class="list-disc pl-5">
             {% for ingredient, quantity in item.ingredients.items %}
             <li> {{ingredient}}: {{quantity}}</li>
             {% endfor %}
@@ -57,17 +57,12 @@
           />
           <input
             type="text"
-            name="price"
-            placeholder="Price"
-            class="p-2 m-2"
-          />
-          <input
-            type="text"
             name="description"
             placeholder="Description"
             class="p-2 m-2"
           />
           <button
+            id="close-modal"
             type="submit"
             class="p-2 m-2 bg-neutral-200 hover:bg-neutral-300"
           >
@@ -79,6 +74,10 @@
     document.getElementById("open-modal").addEventListener("click", () => {
       document.getElementById("modal").showModal();
     }) 
+
+    document.getElementById("close-modal").addEventListener("click", () => {
+      document.getElementById("modal").close();
+    })
     </script>
   </body>
 </html>
