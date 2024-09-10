@@ -2,7 +2,7 @@
 
 Tugas Individu 2 untuk mata kuliah Pemrograman Berbasis Platform Semester Gasal 2024/2025
 
-> Klik link berikut untuk pergi ke ke [deployment PWS]("http://thorbert-anson-goodbyestale.pbp.cs.ui.ac.id") dan [repository GitHub](https://github.com/thorbert-anson-shi/goodbye-stale) untuk <code>goodbye-stale</code>.
+> Klik link berikut untuk pergi ke [deployment PWS]("https://thorbert-anson-goodbyestale.pbp.cs.ui.ac.id") dan [repository GitHub](https://github.com/thorbert-anson-shi/goodbye-stale) untuk <code>goodbye-stale</code>.
 
 <h3>Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).</h3>
 
