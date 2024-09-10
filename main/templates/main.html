@@ -4,12 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Document</title>
+    <title>Goodbye::Stale</title>
   </head>
   <body
-    class="flex flex-col h-screen w-screen justify-center items-center space-y-5"
+    class="flex flex-col h-screen w-screen justify-center items-center space-y-10"
   >
-    <nav></nav>
     <main
       id="items-container"
       class="flex flex-row border-2 border-black p-12 text-xl w-1/2 h-2/3 space-x-5 overflow-scroll items-center bg-white justify-center duration-500 hover:-translate-x-2 hover:-translate-y-2 hover:drop-shadow-[1rem_1rem_rgba(0,0,0,1)]"
@@ -95,12 +94,25 @@
         </form>
       </div>
     </dialog>
-    <button
-      class="p-5 bg-white text-2xl duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] fixed bottom-16 right-16 border-2 border-black"
-      id="open-modal"
-    >
-      Give us suggestions!
-    </button>
+    <div id="contact" class="flex flex-row items-center space-x-5">
+      <button
+        class="p-5 font-bold bg-white text-2xl duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black"
+        id="open-modal"
+      >
+        Give us suggestions!
+      </button>
+      <p class="text-xl">or contact</p>
+      <button
+        class="p-5 bg-white text-xl leading-snug duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black hover:cursor-default"
+      >
+        <p class="font-bold">Thorbert Anson Shi (PBP E)</p>
+        <a
+          href="mailto:tobyas2005139@gmail.com"
+          class="underline hover:cursor-pointer"
+          >tobyas2005139@gmail.com</a
+        >
+      </button>
+    </div>
     <script>
       document.getElementById("open-modal").addEventListener("click", () => {
         document.getElementById("modal").showModal();

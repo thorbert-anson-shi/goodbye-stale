@@ -5,7 +5,7 @@ from django.shortcuts import render
 from .models import *
 
 
-def all_recipes(request):
+def all_recipes(request: HttpRequest):
     recipes = Product.objects.all()
     recipe_list = [recipe for recipe in recipes]
 
