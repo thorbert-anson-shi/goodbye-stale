@@ -354,3 +354,104 @@ Token CSRF (yang lebih mudah diingat sebagai token anti-CSRF) mencegah serangan 
 
 Apabila kita tidak menggunakan <code>csrf_token</code> pada form Django, maka Django tidak akan menerima pengumpulan form yang bersangkutan dengan message 'Forbidden: CSRF verification failed. Request aborted.'
 
+### <u>Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step</u>
+Pertama, saya membuat sebuah class <code>ProductCreationForm</code> yang meng-_inherit_ dari <code>django.forms.ModelForm</code>. 
+
+```python
+class ProductCreationForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ["name", "price", "description", "ingredients", "category"]
+```
+
+Lalu, saya membuat view yang me-_render_ object form <code>ProductCreationForm</code> pada suatu template baru yang saya namakan <code>product-creation.html</code>. 
+
+```python
+def create_product(request: HttpRequest):
+    form = ProductCreationForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return redirect("all_recipes")
+
+    return render(request, "product-creation.html", {"form": form})
+```
+> <code>return redirect("all_recipes")</code> membawa pengguna kembali ke _homepage_ setelah selesai mengisi form.
+
+Isi <code>product-creation.html</code> adalah sebagai berikut:
+
+```html
+{% extends 'base.html' %} {% block content %}
+<h1>Create a product</h1>
+<form
+  method="post"
+>
+  {% csrf_token %} {{ form }}
+  <button type="submit">Confirm</button>
+</form>
+{% endblock content %}
+```
+> Note: jangan lupa untuk menambahkan <code>{% csrf_token %}</code> untuk mencegah terjadinya serangan CSRF lewat form yang dibuat.
+
+Setelah membuat view dan template yang diperlukan, saya menghubungkan view ini dengan URL yang digunakan sebagai endpoint bagi pengguna untuk mengisi form pembuatan <code>Product</code>:
+
+```python
+path("create_product/", create_product, name="create_product"),
+```
+
+Terakhir, saya membuat 4 view untuk melakukan fetching data dari server dalam bentuk JSON dan XML:
+
+```python
+# fetch all products in json
+def fetch_products_json(request: HttpRequest):
+    queryset = Product.objects.all()
+    return HttpResponse(
+        serializers.serialize("json", queryset), content_type="application/json"
+    )
+
+
+# fetch all products in xml
+def fetch_products_xml(request: HttpRequest):
+    queryset = Product.objects.all()
+    return HttpResponse(
+        serializers.serialize("xml", queryset), content_type="application/xml"
+    )
+
+
+# fetch product json by id
+def fetch_product_json_by_id(request: HttpRequest, id: uuid.UUID):
+    queryset = Product.objects.filter(pk=id)
+    return HttpResponse(
+        serializers.serialize("json", queryset), content_type="application/json"
+    )
+
+
+# fetch product xml by id
+def fetch_product_xml_by_id(request: HttpRequest, id: uuid.UUID):
+    queryset = Product.objects.filter(id=id)
+    return HttpResponse(
+        serializers.serialize("xml", queryset), content_type="application/xml"
+    )
+```
+
+Terakhir, setiap view yang saya buat pada langkah ini dihubungkan dengan URL yang bersangkutan dengan menambahkan kode berikut pada berkas <code>main/urls.py</code>:
+
+```python
+urlpatterns = [
+    ...
+    path("json/", fetch_products_json, name="fetch_products_json"),
+    path("xml/", fetch_products_xml, name="fetch_products_xml"),
+    path("json/<str:id>/", fetch_product_json_by_id, name="fetch_product_json_by_id"),
+    path("xml/<str:id>/", fetch_product_xml_by_id, name="fetch_product_xml_by_id"),
+]
+```
+
+### <u>Mengakses keempat URL di poin 2 menggunakan Postman, membuat screenshot dari hasil akses URL pada Postman, dan menambahkannya ke dalam README.md</u>
+<p>GET semua object dalam bentuk JSON</p>
+<img src="ReadmeAssets/all_json.png">
+<p>GET semua object dalam bentuk XML</p>
+<img src="ReadmeAssets/all_xml.png">
+<p>GET object by ID dalam bentuk JSON</p>
+<img src="ReadmeAssets/by_id_json.png">
+<p>GET object by ID dalam bentuk XML</p>
+<img src="ReadmeAssets/by_id_xml.png">
