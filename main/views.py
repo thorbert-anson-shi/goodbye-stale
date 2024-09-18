@@ -56,7 +56,7 @@ def fetch_products_xml(request):
 
 
 # fetch product json by id
-def fetch_product_json_by_id(request, id: uuid.UUID):
+def fetch_product_json_by_id(request, id):
     queryset = Product.objects.filter(pk=id)
     return HttpResponse(
         serializers.serialize("json", queryset), content_type="application/json"
@@ -64,7 +64,7 @@ def fetch_product_json_by_id(request, id: uuid.UUID):
 
 
 # fetch product xml by id
-def fetch_product_xml_by_id(request, id: uuid.UUID):
+def fetch_product_xml_by_id(request, id):
     queryset = Product.objects.filter(pk=id)
     return HttpResponse(
         serializers.serialize("xml", queryset), content_type="application/xml"
