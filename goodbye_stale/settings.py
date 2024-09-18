@@ -28,9 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "thorbert-anson-goodbyestale.pbp.cs.ui.ac.id",
-    "http://thorbert-anson-goodbyestale.pbp.cs.ui.ac.id",
-    "https://thorbert-anson-goodbyestale.pbp.cs.ui.ac.id",
-    "*",
 ]
 
 
