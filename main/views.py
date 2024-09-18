@@ -16,7 +16,7 @@ def all_recipes(request: HttpRequest):
 
 @require_POST
 @csrf_protect
-def add_suggestion(request: HttpRequest):
+def add_suggestion(request):
     request_obj = request.POST
     try:
         ps = ProductSuggestion(
@@ -29,7 +29,7 @@ def add_suggestion(request: HttpRequest):
     return HttpResponse({"message": "Object successfully created!"}, status=201)
 
 
-def create_product(request: HttpRequest):
+def create_product(request):
     form = ProductCreationForm(request.POST or None)
 
     if form.is_valid() and request.method == "POST":
@@ -40,7 +40,7 @@ def create_product(request: HttpRequest):
 
 
 # fetch all products in json
-def fetch_products_json(request: HttpRequest):
+def fetch_products_json(request):
     queryset = Product.objects.all()
     return HttpResponse(
         serializers.serialize("json", queryset), content_type="application/json"
@@ -48,7 +48,7 @@ def fetch_products_json(request: HttpRequest):
 
 
 # fetch all products in xml
-def fetch_products_xml(request: HttpRequest):
+def fetch_products_xml(request):
     queryset = Product.objects.all()
     return HttpResponse(
         serializers.serialize("xml", queryset), content_type="application/xml"
@@ -56,7 +56,7 @@ def fetch_products_xml(request: HttpRequest):
 
 
 # fetch product json by id
-def fetch_product_json_by_id(request: HttpRequest, id: uuid.UUID):
+def fetch_product_json_by_id(request, id: uuid.UUID):
     queryset = Product.objects.filter(pk=id)
     return HttpResponse(
         serializers.serialize("json", queryset), content_type="application/json"
@@ -64,12 +64,12 @@ def fetch_product_json_by_id(request: HttpRequest, id: uuid.UUID):
 
 
 # fetch product xml by id
-def fetch_product_xml_by_id(request: HttpRequest, id: uuid.UUID):
-    queryset = Product.objects.filter(id=id)
+def fetch_product_xml_by_id(request, id: uuid.UUID):
+    queryset = Product.objects.filter(pk=id)
     return HttpResponse(
         serializers.serialize("xml", queryset), content_type="application/xml"
     )
 
 
-def create_order(request: HttpRequest):
+def create_order(request):
     return HttpResponse("No response yet")
