@@ -43,7 +43,9 @@ def login_user(request: HttpRequest):
 
 def logout_user(request: HttpRequest):
     logout(request)
-    return redirect("all_recipes")
+    response = HttpResponseRedirect(reverse("all_recipes"))
+    response.delete_cookie("last_login")
+    return response
 
 
 def all_recipes(request: HttpRequest):
@@ -53,7 +55,9 @@ def all_recipes(request: HttpRequest):
     context = {
         "recipes": recipe_list,
         "user": request.user.username or None,
-        "last_login": request.COOKIES["last_login"],
+        "last_login": (
+            request.COOKIES["last_login"] if "last_login" in request.COOKIES else None
+        ),
     }
 
     return render(request, "main.html", context)
