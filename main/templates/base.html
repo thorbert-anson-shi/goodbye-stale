@@ -6,11 +6,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
     {% block meta %} {% endblock meta %}
   </head>
 
   <body
-    class="flex flex-col h-screen w-screen justify-center items-center overflow-scroll"
+    class="h-screen w-screen flex flex-col justify-start items-center overflow-scroll"
   >
     {% block content %} {% endblock content %}
   </body>

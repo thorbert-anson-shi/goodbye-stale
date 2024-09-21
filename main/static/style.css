@@ -1,0 +1,16 @@
+input,
+textarea {
+    border: solid 2px black;
+    padding: 4px !important;
+}
+
+label {
+    font-weight: bold;
+    font-size: large;
+    margin-right: 16px;
+}
+
+ul.errorlist li {
+    font-weight: bold;
+    color: red;
+}

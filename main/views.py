@@ -1,6 +1,9 @@
-from django.http import HttpResponse, HttpRequest
+import datetime
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.core import serializers
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from .forms import ProductCreationForm
@@ -28,7 +31,11 @@ def login_user(request: HttpRequest):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("all_recipes")
+            response = HttpResponseRedirect(reverse("all_recipes"))
+            response.set_cookie(
+                "last_login", str(datetime.datetime.now().strftime("%d/%m/%Y %H:%M"))
+            )
+            return response
     else:
         form = AuthenticationForm(request)
     return render(request, "login.html", {"form": form})
@@ -36,14 +43,20 @@ def login_user(request: HttpRequest):
 
 def logout_user(request: HttpRequest):
     logout(request)
-    return redirect("login")
+    return redirect("all_recipes")
 
 
 def all_recipes(request: HttpRequest):
     recipes = Product.objects.all()
     recipe_list = [recipe for recipe in recipes]
 
-    return render(request, "main.html", {"recipes": recipe_list})
+    context = {
+        "recipes": recipe_list,
+        "user": request.user.username or None,
+        "last_login": request.COOKIES["last_login"],
+    }
+
+    return render(request, "main.html", context)
 
 
 @require_POST
@@ -61,6 +74,7 @@ def add_suggestion(request: HttpRequest):
     return HttpResponse({"message": "Object successfully created!"}, status=201)
 
 
+@login_required(login_url="login")
 def create_product(request: HttpRequest):
     form = ProductCreationForm(request.POST or None)
 
