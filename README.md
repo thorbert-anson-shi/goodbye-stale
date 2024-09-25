@@ -500,3 +500,186 @@ def my_view(request: HttpRequest):
 Kesimpulannya, <code>HttpResponseRedirect</code> dan <code>redirect()</code> berperan untuk melakukan redirect, namun fungsi redirect cenderung lebih fleksibel dibandingkan dengan <code>HttpResponseRedirect</code>.
 
 Namun, harus kita perhatikan bahwa fungsi <code>redirect</code> langsung melakukan redirect saat fungsinya dipanggil, sedangkan memanggil konstruktor <code>HttpResponseRedirect</code> tidak langsung mengembalikan _response_ ke pengguna. Oleh karena itu, apabila kita perlu memodifikasi isi dari response sebelum melakukan _redirect_, pembuatan objek <code>HttpResponseRedirect</code> lebih tepat digunakan.
+
+## <u>Jelaskan cara kerja penghubungan model Product dengan User!</u>
+
+Kita dapat menghubungkan dua model dengan membuat referensi antara model menggunakan <code>models.ForeignKey</code>.
+
+Pada pengerjaan Tugas 4 saya, saya menghubungkan masing-masing <code>Product</code> dengan <code>User</code> yang membuat <code>Product</code> tersebut.
+
+Hal ini saya capai dengan membuat hubungan <code>ForeignKey</code> pada model <code>Product</code> yang merujuk pada suatu <code>User</code>. Hal ini menandakan bahwa satu <code>Product</code> akan berkorespondensi dengan hanya satu <code>User</code>.
+
+```python
+from django.db import models
+from django.contrib.auth.models import User
+
+class Product(models.Model):
+    # atribut lain
+    # ...
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="product"
+    )
+```
+
+> Note: keyword argument <code>on_delete=models.CASCADE</code> menandakan bahwa apabila objek <code>User</code> dihapus, maka objek <code>Product</code> yang ia ciptakan juga dihapus.
+
+Lalu, pada bagian views, saya mengubah kode untuk menambahkan informasi user yang membuat <code>Product</code> dengan menyisipkan informasi tersebut sebelum melakukan <code>save</code> pada database.
+
+```python
+...
+
+def create_product(request: HttpRequest):
+    form = ProductCreationForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        product = form.save(commit=False)
+        product.creator = request.user
+        product.save()
+        return redirect("all_recipes")
+
+    return render(request, "product-creation.html", {"form": form})
+
+...
+```
+
+Langkah ini menambahkan informasi <code>request.user</code>, yakni pengguna yang membuat objek <code>Product</code> pada objek yang bersangkutan.
+
+Dengan melakukan hal ini, kita dapat mengakses properti <code>creator</code> pada template yang menggunakan data <code>Product</code>.
+
+```html
+{% for recipe in recipes %} ...
+
+<div class="w-1/2">
+  <h1 class="font-bold text-2xl">{{recipe.name}}</h1>
+  <p class="text-lg">oleh {{recipe.creator}}</p>
+</div>
+
+... {% endfor %}
+```
+
+## <u>Apa perbedaan antara authentication dan authorization, apakah yang dilakukan saat pengguna login? Jelaskan bagaimana Django mengimplementasikan kedua konsep tersebut.</u>
+
+_Authentication_ adalah proses dimana suatu program memastikan bahwa seorang pengguna yang sedang mengakses suatu _resource_ benar-benar merupakan orang tersebut.
+
+_Authorization_ adalah proses memastikan bahwa seorang pengguna yang sedang mengakses suatu _resource_ memiliki hak untuk melakukan hal tersebut. Apabila seseorang yang tidak _authorized_ mencoba mengakses suatu _resource_, maka sistem _authorization_ suatu program harus mencegah pengguna tersebut untuk menggunakan _resource_ tersebut.
+
+Saat seorang pengguna melakukan login, ia sedang melakukan _authentication_, dimana ia memasukkan _username_ dan _password_ untuk membuktikan kepada program bahwa ia benar-benar orang yang sama yang melakukan _registration_ dengan _username_ dan _password_ tersebut.
+
+Django mengimplementasikan _authentication_ dengan beberapa sistem seperti token based authentication, session authentication, atau basic authentication dengan username dan password. Sistem-sistem ini memfasilitasi pengguna untuk melakukan login melalui berbagai cara yang berbeda untuk keperluan tertentu.
+
+Secara high level, kita dapat menggunakan fungsi <code>django.auth.contrib.login()</code> untuk melakukan login, dan untuk setiap request yang kita buat setelah logged-in, Django akan menambahkan satu attribute, yakni <code>request.user</code>, yang dapat diakses oleh masing-masing view untuk mendapatkan informasi dari user yang sudah logged-in tersebut.
+
+Django mengimplementasikan _authorization_ dengan menggunakan beberapa class yang mengatur permission seorang user terhadap view function tertentu. Django juga memiliki beberapa wrapper function yang membantu programmer untuk mengimplementasikan _authorization_ terhadap view_function tertentu.
+
+Sebagai contoh, pada pengerjaan Tugas 4, kita menggunakan wrapper function <code>login*required</code> untuk memastikan bahwa user yang belum logged-in tidak dapat mengakses \_resource* tertentu pada server.
+
+```python
+@login_required(login_url="login")
+def create_product(request: HttpRequest):
+    # kode pembuatan produk
+    # ...
+```
+
+> Decorator @login_required() menyatakan bahwa view ini hanya dapat diakses setelah user melakukan login, dan apabila tidak, maka mereka akan di-redirect ke URL <code>login</code>.
+
+## <u>Bagaimana Django mengingat pengguna yang telah login? Jelaskan kegunaan lain dari cookies dan apakah semua cookies aman digunakan?</u>
+
+Django mengingat pengguna dengan memeriksa keberadaan suatu **_cookie_** dengan nama <code>sessionid</code>. Hal ini menunjukkan bahwa Django menggunakan _session authentication_ untuk melakukan _authentication_ pengguna. Saat user melakukan login, server membuat suatu _session cookie_ yang dikirimkan ke user.
+
+User akan menyimpan cookie ini, dan saat ia mengakses sebuah resource, ia juga mengirim _session cookie_ ini dan menandakan kepada server bahwa ia sudah logged-in.
+
+Selain _authentication_, _cookie_ juga dapat digunakan untuk menyimpan preferensi pengguna, melacak aktivitasnya pada situs tersebut, atau digunakan oleh perusahaan pembuat situs sebagai informasi yang berharga untuk pemasaran dan analitik pengguna.
+
+Secara umum, data sensitif sebaiknya tidak disimpan pada _cookie_, karena apabila tidak di-setup dengan baik, cookie ini dapat diakses dan dimodifikasi oleh pihak yang tidak berwenang untuk melakukan serangan _man-in-the-middle_, dimana penyerang mencuri data _cookie_ dan berperan seperti pengguna yang autentik saat menggunakan situs yang ingin diakses pengguna awal.
+
+## <u>Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).</u>
+
+Untuk mengimplementasi fungsi registrasi, login, dan logout, saya menggunakan function-function dan form built-in yang disediakan oleh Django.
+
+Untuk registrasi, saya menggunakan form <code>django.contrib.auth.forms.UserCreationForm</code> untuk membuat instance <code>User</code> baru yang akan disimpan pada database.
+
+```python
+def register(request: HttpRequest):
+    # Create empty form to return during initial render
+    form = UserCreationForm()
+
+    if request.method == "POST":
+        # Create user if request is a POST request
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("login")
+    return render(request, "register.html", {"form": form})
+```
+
+Untuk login dan logout, saya menggunakan _function_ <code>django.contrib.auth.login</code> dan <code>django.contrib.auth.logout</code>.
+
+```python
+def login_user(request: HttpRequest):
+    if request.method == "POST":
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            response = HttpResponseRedirect(reverse("all_recipes"))
+            response.set_cookie(
+                "last_login", str(datetime.datetime.now().strftime("%d/%m/%Y %H:%M"))
+            )
+            return response
+    else:
+        form = AuthenticationForm(request)
+    return render(request, "login.html", {"form": form})
+
+
+def logout_user(request: HttpRequest):
+    logout(request)
+    response = HttpResponseRedirect(reverse("all_recipes"))
+    response.delete_cookie("last_login")
+    return response
+```
+
+Kemudian, saya membuat beberapa endpoint untuk memungkinkan pengguna mengakses view yang baru saya buat sebagai berikut:
+
+```python
+urlpatterns = [
+    ...
+    path("register/", register, name="register"),
+    path("login/", login_user, name="login"),
+    path("logout/", logout_user, name="logout"),
+    ...
+]
+```
+
+Kemudian, saya membuat beberapa file HTML yang mengandung form yang dikembalikan oleh view ,<code>register</code> dan <code>login_user</code>.
+
+Untuk membuat dua akun pengguna, saya mengisi form yang mengakses view <code>register</code> sebanyak dua kali dengan data pengguna yang berbeda setiap kalinya.
+
+Untuk membuat tiga _dummy data_, saya mengakses form yang terdapat pada endpoint <code>create_product</code> dan membuat 3 product.
+
+Untuk proses penghubungan antara model <code>User</code> dan <code>Product</code>, detailnya sudah saya jabarkan saat menjawab pertanyaan bagaimana menghubungkan model <code>Product</code> dan <code>User</code>.
+
+Untuk menambahkan cookies pada setiap request yang dibuat user, saya menambahkan sedikit kode pada view <code>login</code> yang mengubah atribute <code>request.COOKIES</code> pada sesi user supaya menunjukkan waktu login.
+
+```python
+def login_user(request: HttpRequest):
+    if request.method == "POST":
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            # kode lain
+            # ...
+            response = HttpResponseRedirect(reverse("all_recipes"))
+            response.set_cookie(
+                "last_login",
+                str(datetime
+                .datetime
+                .now()
+                .strftime("%d/%m/%Y %H:%M"))
+            )
+            return response
+    # kode lain
+    # ...
+```
+
+<code>all*recipes</code> yang mengakses \_cookie*
