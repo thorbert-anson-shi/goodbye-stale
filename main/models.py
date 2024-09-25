@@ -18,6 +18,9 @@ class Product(models.Model):
     description = models.TextField()
     ingredients = models.JSONField(default=dict)
     category = models.CharField(choices=Category.choices, null=True, max_length=2)
+    creator = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="product", default=1
+    )
 
 
 class ProductSuggestion(models.Model):

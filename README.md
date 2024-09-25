@@ -330,24 +330,29 @@ Hal yang terjadi dalam penggunaan model seperti ini adalah:
 Dari proses interaksi antara pengguna dan data ini, kita dapat melihat bahwa pengguna tidak pernah membuat _query_ secara langsung kepada database. Pengguna hanya perlu berinteraksi dengan representasi objek yang diberikan oleh model, lalu model ini akan mengatur komunikasi antara server dan database.
 
 ## Tugas Individu 3
+
 ### <u>Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?</u>
+
 _Data delivery_ memungkinkan pengguna untuk mengakses dan berinteraksi dengan data yang bersifat dinamis, yakni data yang dapat berubah dan dapat datang dalam berbagai bentuk (teks, gambar, audio, dll.). Keberadaan data delivery dapat mengubah webpage yang sebelumnya hanya berisi data statis dan _hard-coded_, menjadi webpage yang dapat merefleksikan perubahan-perubahan yang terjadi pada server.
 
 ### <u>Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?</u>
-Menurut saya, kedua JSON dan XML memiliki kelebihan dan kekurangan pada bidang tertentu. Salah satu kelebihan JSON adalah performa saat melakukan parsing. 
 
-Hal ini dikarenakan struktur JSON yang sederhana memungkinkannya untuk diterjemahkan secara langsung menjadi object dalam JavaScript (dan beberapa bahasa pemrograman lainnya). 
+Menurut saya, kedua JSON dan XML memiliki kelebihan dan kekurangan pada bidang tertentu. Salah satu kelebihan JSON adalah performa saat melakukan parsing.
+
+Hal ini dikarenakan struktur JSON yang sederhana memungkinkannya untuk diterjemahkan secara langsung menjadi object dalam JavaScript (dan beberapa bahasa pemrograman lainnya).
 
 XML memiliki kemampuan validasi data yang lebih baik dibandingkan JSON, dikarenakan adanya DTD (Document Type Definition) dan XSD (XML schema) untuk validasi data XML, dibandingkan dengan JSON yang memerlukan library third-party untuk melakukan validasi data.
 
 Menurut saya JSON lebih populer daripada XML dikarenakan representasinya yang lebih familiar, yakni key-value pair yang dapat ditemui dalam berbagai bahasa pemrograman seperti JavaScript dan Python.
 
 ### <u>Jelaskan fungsi dari method <code>is_valid()</code> pada form Django dan mengapa kita membutuhkan method tersebut?</u>
-Method <code>is_valid()</code> memeriksa masukan pengguna dan memastikan bahwa masukan tersebut sesuai dengan skema yang sudah ditentukan untuk form tersebut. Sebagai contoh, apabila dalam suatu form, <code>field_a</code> didefinisikan sebagai <code>forms.CharField(max_length=20)</code>, maka method <code>is_valid()</code> akan memeriksa masukan pengguna untuk <code>field_a</code> dan memastikan kalau panjangnya tidak lebih dari 20. 
+
+Method <code>is_valid()</code> memeriksa masukan pengguna dan memastikan bahwa masukan tersebut sesuai dengan skema yang sudah ditentukan untuk form tersebut. Sebagai contoh, apabila dalam suatu form, <code>field_a</code> didefinisikan sebagai <code>forms.CharField(max_length=20)</code>, maka method <code>is_valid()</code> akan memeriksa masukan pengguna untuk <code>field_a</code> dan memastikan kalau panjangnya tidak lebih dari 20.
 
 Dalam konteks <code>ModelForm</code>, apabila terdapat salah satu bagian dari input data pengguna yang tidak tepat, <code>form.is_valid()</code> akan mengembalikan <code>False</code> dan mencegah pembuatan instance model yang baru dari data masukan tersebut.
 
 ### <u>Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?</u>
+
 Cross-site Request Forgery merupakan sejenis serangan siber yang melibatkan seorang penyerang menggunakan kredensial yang diberikan oleh pengguna lewat cookie atau authentication token. Dengan _social engineering_, penyerang dapat membuat pengguna mengakses laman yang terinfeksi. Laman ini memiliki kemampuan untuk membuat request ke _target_ website yang ingin dikunjungi pengguna. Dengan mendapatkan informasi autentikasi yang didapatkan, penyerang mendapatkan akses kepada akun pengguna dan dapat melakukan hal-hal yang merugikan korban.
 
 Token CSRF (yang lebih mudah diingat sebagai token anti-CSRF) mencegah serangan CSRF dengan membuat sebuah bilangan acak yang perlu dikirim bersama dengan form yang dikumpulkan. Bilangan acak ini dibuat oleh server dan diberikan kepada pengguna lewat cookie atau hidden field dari sebuah form. Agar form dianggap valid, pengguna harus mengumpulkan form tersebut beserta dengan token anti-CSRF, supaya server dapat memvalidasi bahwa form yang dikumpulkan pengguna merupakan form yang diberikan server.
@@ -355,7 +360,8 @@ Token CSRF (yang lebih mudah diingat sebagai token anti-CSRF) mencegah serangan 
 Apabila kita tidak menggunakan <code>csrf_token</code> pada form Django, maka Django tidak akan menerima pengumpulan form yang bersangkutan dengan message 'Forbidden: CSRF verification failed. Request aborted.'
 
 ### <u>Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step</u>
-Pertama, saya membuat sebuah class <code>ProductCreationForm</code> yang meng-_inherit_ dari <code>django.forms.ModelForm</code>. 
+
+Pertama, saya membuat sebuah class <code>ProductCreationForm</code> yang meng-_inherit_ dari <code>django.forms.ModelForm</code>.
 
 ```python
 class ProductCreationForm(forms.ModelForm):
@@ -364,7 +370,7 @@ class ProductCreationForm(forms.ModelForm):
         fields = ["name", "price", "description", "ingredients", "category"]
 ```
 
-Lalu, saya membuat view yang me-_render_ object form <code>ProductCreationForm</code> pada suatu template baru yang saya namakan <code>product-creation.html</code>. 
+Lalu, saya membuat view yang me-_render_ object form <code>ProductCreationForm</code> pada suatu template baru yang saya namakan <code>product-creation.html</code>.
 
 ```python
 def create_product(request: HttpRequest):
@@ -376,21 +382,21 @@ def create_product(request: HttpRequest):
 
     return render(request, "product-creation.html", {"form": form})
 ```
-> <code>return redirect("all_recipes")</code> membawa pengguna kembali ke _homepage_ setelah selesai mengisi form.
+
+> <code>return redirect("all*recipes")</code> membawa pengguna kembali ke \_homepage* setelah selesai mengisi form.
 
 Isi <code>product-creation.html</code> adalah sebagai berikut:
 
 ```html
 {% extends 'base.html' %} {% block content %}
 <h1>Create a product</h1>
-<form
-  method="post"
->
+<form method="post">
   {% csrf_token %} {{ form }}
   <button type="submit">Confirm</button>
 </form>
 {% endblock content %}
 ```
+
 > Note: jangan lupa untuk menambahkan <code>{% csrf_token %}</code> untuk mencegah terjadinya serangan CSRF lewat form yang dibuat.
 
 Setelah membuat view dan template yang diperlukan, saya menghubungkan view ini dengan URL yang digunakan sebagai endpoint bagi pengguna untuk mengisi form pembuatan <code>Product</code>:
@@ -447,6 +453,7 @@ urlpatterns = [
 ```
 
 ### <u>Mengakses keempat URL di poin 2 menggunakan Postman, membuat screenshot dari hasil akses URL pada Postman, dan menambahkannya ke dalam README.md</u>
+
 <p>GET semua object dalam bentuk JSON</p>
 <img src="ReadmeAssets/all_json.png">
 <p>GET semua object dalam bentuk XML</p>
@@ -455,3 +462,41 @@ urlpatterns = [
 <img src="ReadmeAssets/by_id_json.png">
 <p>GET object by ID dalam bentuk XML</p>
 <img src="ReadmeAssets/by_id_xml.png">
+
+## Tugas Individu 4
+
+### <u>Apa perbedaan antara <code>HttpResponseRedirect()</code> dan <code>redirect()</code>?</u>
+
+<code>HttpResponseRedirect</code> merupakan suatu class HTTP Response yang disediakan oleh Django untuk merepresentasikan response dari server yang membawa (_redirect_) pengguna ke halaman yang berbeda. Dalam implementasinya, kita dapat membuat sebuah _object_ <code>HttpResponseRedirect</code> lalu mengembalikannya pada suatu view seperti berikut:
+
+```python
+from django.http import HttpRequest, HttpResponseRedirect
+
+def my_view(request: HttpRequest):
+    # kode lain
+    # ...
+    return HttpResponseRedirect('/url/yang/dituju/')
+```
+
+Sedangkan, fungsi <code>redirect()</code> yang disediakan oleh Django merupakan convenience function yang juga melakukan redirect terhadap pengguna. Namun, ia juga menerima argumen lain selain URL yang dituju, seperti nama view yang bersangkutan, atau saat URL yang dituju bersifat dinamis dan memiliki parameter yang dapat berubah.
+
+```python
+from django.http import HttpRequest
+from django.shortcuts import redirect
+
+def my_view(request: HttpRequest):
+    # kode lain
+    # ...
+    return redirect('nama view')
+
+    # atau
+
+def my_view(request: HttpRequest):
+    # kode lain
+    # ...
+    return redirect('url/yang/dituju/')
+```
+
+Kesimpulannya, <code>HttpResponseRedirect</code> dan <code>redirect()</code> berperan untuk melakukan redirect, namun fungsi redirect cenderung lebih fleksibel dibandingkan dengan <code>HttpResponseRedirect</code>.
+
+Namun, harus kita perhatikan bahwa fungsi <code>redirect</code> langsung melakukan redirect saat fungsinya dipanggil, sedangkan memanggil konstruktor <code>HttpResponseRedirect</code> tidak langsung mengembalikan _response_ ke pengguna. Oleh karena itu, apabila kita perlu memodifikasi isi dari response sebelum melakukan _redirect_, pembuatan objek <code>HttpResponseRedirect</code> lebih tepat digunakan.

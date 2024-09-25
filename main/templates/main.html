@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <nav
-  class="w-full h-24 border-b-black border-2 flex flex-row justify-between items-center px-5"
+  class="w-full h-24 shrink-0 border-b-black border-2 flex flex-row justify-between items-center px-5"
 >
   {% if recipes %}
   <h1 class="font-bold text-3xl text-left">Goodbye::Stale</h1>
@@ -57,7 +57,10 @@
           <div
             class="bg-white p-5 flex flex-row mb-3 justify-between items-center"
           >
-            <h1 class="font-bold text-2xl w-1/2">{{item.name}}</h1>
+            <div class="w-1/2">
+              <h1 class="font-bold text-2xl">{{item.name}}</h1>
+              <p class="text-lg">oleh {{item.creator}}</p>
+            </div>
             <h2 class="text-right w-1/2">Rp {{item.price}}</h2>
           </div>
           <details class="px-5 space-y-2" open>
@@ -96,7 +99,7 @@
     </div>
     {% endif %}
   </main>
-  <div id="contact" class="flex flex-row items-center space-x-5">
+  <div id="contact" class="flex flex-row items-center space-x-5 m-10">
     <button
       class="p-5 font-bold bg-white text-2xl duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black"
       id="open-modal"
@@ -192,3 +195,21 @@
   });
 </script>
 {% endblock content %}
+
+<section>
+  <h1>Judul</h1>
+  <h2>Subjudul</h2>
+  <p>Ini deskripsi ges</p>
+  <table>
+    <tbody>
+      <tr>
+        <th>nama</th>
+        <th>npm</th>
+      </tr>
+      <tr>
+        <td>thorbert</td>
+        <td>2306221900</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

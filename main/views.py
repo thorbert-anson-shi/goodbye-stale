@@ -83,7 +83,9 @@ def create_product(request: HttpRequest):
     form = ProductCreationForm(request.POST or None)
 
     if form.is_valid() and request.method == "POST":
-        form.save()
+        product = form.save(commit=False)
+        product.creator = request.user
+        product.save()
         return redirect("all_recipes")
 
     return render(request, "product-creation.html", {"form": form})
