@@ -1,49 +1,96 @@
 {% extends 'base.html' %} {% block content %}
 <nav
-  class="w-full h-24 shrink-0 border-b-black border-2 flex flex-row justify-between items-center px-5"
+  class="w-full md:h-24 h-fit shrink-0 flex flex-col justify-between items-center fixed top-0 z-50 bg-white"
 >
-  {% if recipes %}
-  <h1 class="font-bold text-3xl text-left">Goodbye::Stale</h1>
-  {% endif %} {% if user %}
-  <section class="flex flex-row justify-end items-center space-x-5">
-    <p class="text-right">Last logged in:<br />{{ last_login }}</p>
-    <a href="{% url 'logout' %}">
-      <button class="border-2 border-black p-3 hover:bg-red-500">
-        Log out
-      </button>
-    </a>
-  </section>
-  {% else %}
   <div
-    id="auth-btn-group"
-    class="flex flex-row justify-end items-center space-x-5"
+    id="top-row"
+    class="h-24 w-full border-b-black border-2 flex flex-row justify-between items-center md:px-5 px-3"
   >
-    <a href="{% url 'register' %}"
-      ><button class="border-2 border-black p-3 hover:bg-neutral-300">
-        Register
-      </button></a
+    <button
+      id="menu-toggle"
+      class="block md:hidden border-2 border-black p-2"
+      aria-label="Toggle Menu"
     >
-    <a href="{% url 'login' %}"
-      ><button class="border-2 border-black p-3 hover:bg-green-500">
-        Log In
-      </button></a
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        ></path>
+      </svg>
+    </button>
+
+    {% if recipes %}
+    <h1 class="font-bold md:text-3xl text-xl text-left">Goodbye::Stale</h1>
+    {% endif %}
+
+    <div
+      id="navbar-desktop"
+      class="hidden md:flex flex-row font-bold justify-center space-x-10 items-center ease-linear *:duration-200"
     >
+      <a href="" class="hover:border-b-2 hover:border-b-black">About Us</a>
+      <a href="" class="hover:border-b-2 hover:border-b-black">Home</a>
+      <a href="" class="hover:border-b-2 hover:border-b-black">Products</a>
+      <a href="" class="hover:border-b-2 hover:border-b-black">Categories</a>
+    </div>
+
+    {% if user.is_authenticated %}
+    <section class="flex flex-row justify-end items-center space-x-5">
+      <p class="text-right">Last logged in:<br />{{ last_login }}</p>
+      <a href="{% url 'logout' %}">
+        <button class="border-2 border-black p-3 hover:bg-red-500">
+          Log out
+        </button>
+      </a>
+    </section>
+    {% else %}
+    <div
+      id="auth-btn-group"
+      class="flex flex-row justify-end text-sm md:text-lg items-center space-x-3 md:space-x-5"
+    >
+      <a href="{% url 'register' %}"
+        ><button class="border-2 border-black md:p-3 p-2 hover:bg-neutral-300">
+          Register
+        </button></a
+      >
+      <a href="{% url 'login' %}"
+        ><button class="border-2 border-black md:p-3 p-2 hover:bg-green-500">
+          Log In
+        </button></a
+      >
+    </div>
   </div>
   {% endif %}
+  <div
+    id="navbar-mobile"
+    class="flex hidden flex-col font-bold justify-center space-y-3 text-lg items-center h-fit ease-linear *:duration-200 border-b-2 w-full border-black"
+  >
+    <a href="">About Us</a>
+    <a href="">Home</a>
+    <a href="">Products</a>
+    <a href="">Categories</a>
+  </div>
 </nav>
 <div class="h-full w-full flex flex-col justify-center items-center">
   <main
     id="main-container"
-    class="flex flex-col z-20 text-xl w-1/2 h-2/3 bg-white items-center"
+    class="flex flex-col z-20 text-xl w-4/5 md:w-1/2 h-2/3 bg-white items-center md:mt-32"
   >
     <div
       id="items-container"
-      class="flex flex-col items-center m-5 justify-center bg-white h-full w-full z-20 p-3 border-2 border-black duration-500 hover:-translate-x-2 hover:-translate-y-2 hover:drop-shadow-[1rem_1rem_rgba(0,0,0,1)]"
+      class="flex flex-col items-center m-5 justify-center bg-white h-full w-full z-20 p-3 border-2 border-black md:duration-500 hover:-translate-x-2 hover:-translate-y-2 hover:drop-shadow-[1rem_1rem_rgba(0,0,0,1)]"
     >
       {% if recipes %}
       <h1 class="text-left text-3xl font-bold ml-5 mb-5 self-start">
-        {% if user %} What do you feel like getting, {{user}}? {% else %} Our
-        not so stale recipes {% endif %}
+        {% if user.is_authenticated %} What do you feel like getting, {{user}}?
+        {% else %} Our not so stale recipes {% endif %}
       </h1>
       {% endif %}
       <div
@@ -52,18 +99,18 @@
       >
         {% for item in recipes %}
         <div
-          class="w-1/2 h-full border-2 border-black p-5 overflow-scroll shrink-0 mx-2"
+          class="w-1/2 h-full flex flex-col border-2 border-black p-5 overflow-scroll shrink-0 mx-2"
         >
           <div
             class="bg-white p-5 flex flex-row mb-3 justify-between items-center"
           >
             <div class="w-1/2">
               <h1 class="font-bold text-2xl">{{item.name}}</h1>
-              <p class="text-lg">oleh {{item.creator}}</p>
+              <p class="text-lg">by {{item.creator}}</p>
             </div>
             <h2 class="text-right w-1/2">Rp {{item.price}}</h2>
           </div>
-          <details class="px-5 space-y-2" open>
+          <details class="px-5 space-y-2 mb-10" open>
             <div>
               <h2 class="font-bold">Description</h2>
               <h2>{{item.description}}</h2>
@@ -77,6 +124,23 @@
               </ul>
             </div>
           </details>
+          {% if user.is_authenticated and item.creator == user %}
+          <div
+            id="modify-product"
+            class="flex flex-row justify-center text-center space-x-3 mt-auto"
+          >
+            <a
+              href="{% url 'edit_product' item.id %}"
+              class="border-2 border-black p-3 hover:bg-neutral-300 flex-grow"
+              >Edit</a
+            >
+            <a
+              href="{% url 'delete_product' item.id %}"
+              class="border-2 border-black p-3 hover:bg-red-500 flex-grow"
+              >Delete</a
+            >
+          </div>
+          {% endif %}
         </div>
         {% empty %}
         <div id="no-recipes-text" class="text-right w-full space-y-5">
@@ -90,7 +154,7 @@
     </div>
     {% if user %}
     <div
-      class="-z-30 border-2 border-black p-8 bg-white absolute top-[60vh] left-[24vw] duration-500 hover:-translate-x-[12rem]"
+      class="-z-30 border-2 border-black p-8 bg-white absolute top-[60vh] left-[24vw] md:duration-500 hover:-translate-x-[12rem]"
     >
       <a target="_blank" href="{% url 'create_product' %}"
         >Psst... you wanna<br />
@@ -99,16 +163,19 @@
     </div>
     {% endif %}
   </main>
-  <div id="contact" class="flex flex-row items-center space-x-5 m-10">
+  <div
+    id="contact"
+    class="md:flex md:flex-row flex-col md:items-center items-start md:space-x-5 space-y-1 m-10 fixed md:relative bottom-1 md:bottom-0 left-1 md:left-0 z-50"
+  >
     <button
-      class="p-5 font-bold bg-white text-2xl duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black"
+      class="md:p-5 p-2 font-bold bg-white md:text-2xl text-md md:duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black"
       id="open-modal"
     >
       Give us suggestions!
     </button>
-    <p class="text-xl">or contact</p>
+    <p class="md:text-xl text-md">or contact</p>
     <button
-      class="p-5 bg-white text-xl leading-snug duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black hover:cursor-default"
+      class="md:p-5 p-2 bg-white md:text-xl text-sm md:duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black hover:cursor-default"
     >
       <p class="font-bold">Thorbert Anson Shi (PBP E)</p>
       <a
@@ -193,23 +260,10 @@
     // Empty form after submission
     form.reset();
   });
+
+  document.getElementById("menu-toggle").addEventListener("click", function () {
+    const menu = document.getElementById("navbar-mobile");
+    menu.classList.toggle("hidden");
+  });
 </script>
 {% endblock content %}
-
-<section>
-  <h1>Judul</h1>
-  <h2>Subjudul</h2>
-  <p>Ini deskripsi ges</p>
-  <table>
-    <tbody>
-      <tr>
-        <th>nama</th>
-        <th>npm</th>
-      </tr>
-      <tr>
-        <td>thorbert</td>
-        <td>2306221900</td>
-      </tr>
-    </tbody>
-  </table>
-</section>

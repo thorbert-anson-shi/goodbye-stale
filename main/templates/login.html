@@ -1,16 +1,23 @@
 {% extends 'base.html' %} {% block content %}
 <div class="flex flex-col w-full h-full justify-center items-center">
   <form
-    method="post"
-    class="border-2 border-black p-5 flex flex-col w-fit items-center space-y-10"
+    method="POST"
+    class="bg-white border-2 border-black p-10 flex flex-col w-fit items-center space-y-10 duration-500 hover:-translate-x-2 hover:-translate-y-2 hover:drop-shadow-[1rem_1rem_rgba(0,0,0,1)]"
   >
     <div class="font-bold text-6xl m-16 text-right">
       <h1>Goodbye</h1>
       <h1>::Stale</h1>
     </div>
-    <h1 class="text-2xl font-bold">Log in to Goodbye::Stale</h1>
+    <h1 class="text-3xl font-bold">Log in to Goodbye::Stale</h1>
     {% csrf_token %}
-    <div class="space-y-3 my-3 w-full text-right text-xl">{{ form }}</div>
+    <div class="space-y-3 w-full text-xl">
+      {% for field in form %}
+      <div class="flex flex-col justify-between">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+    </div>
     <div class="flex flex-row w-full justify-center space-x-5">
       <a href="{% url 'all_recipes' %}" class="flex-grow">
         <button
@@ -28,5 +35,13 @@
       </button>
     </div>
   </form>
+  {% comment %} {% if messages %} {% for message in messages %} {% if
+  message.tags == 'error'%}
+  <p class="text-red-600">{{ message }}</p>
+  {% elif message.tags == 'success' %}
+  <p class="text-green-600">{{ message }}</p>
+  {% else %}
+  <p class="text-blue-600">{{ message }}</p>
+  {% endif %} {% endfor %} {% endif %} {% endcomment %}
 </div>
 {% endblock content %}

@@ -682,4 +682,22 @@ def login_user(request: HttpRequest):
     # ...
 ```
 
-<code>all*recipes</code> yang mengakses \_cookie*
+Kemudian, _cookie_ tersebut saya akses pada view <code>all_recipes</code> dengan mengembalikan cookie tersebut pada objek <code>context</code> yang dikembalikan view kepada _template engine_.
+
+```python
+def all_recipes(request: HttpRequest):
+    recipes = Product.objects.all()
+    recipe_list = [recipe for recipe in recipes]
+
+    context = {
+        "recipes": recipe_list,
+        "user": request.user.username or None,
+        "last_login": (
+            request.COOKIES["last_login"] if "last_login" in request.COOKIES else None
+        ),
+    }
+
+    return render(request, "main.html", context)
+```
+
+> Note: _Conditional statement_ pada attribute "last_login" dibutuhkan untuk memastikan tidak terjadi KeyError saat user tidak logged-in, dan field "last_login" mencoba mengakses objek <code>request.COOKIES["last_login"]</code> yang tidak ada.

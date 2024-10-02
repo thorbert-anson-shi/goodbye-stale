@@ -54,7 +54,7 @@ def all_recipes(request: HttpRequest):
 
     context = {
         "recipes": recipe_list,
-        "user": request.user.username or None,
+        "user": request.user or None,
         "last_login": (
             request.COOKIES["last_login"] if "last_login" in request.COOKIES else None
         ),
@@ -88,7 +88,30 @@ def create_product(request: HttpRequest):
         product.save()
         return redirect("all_recipes")
 
-    return render(request, "product-creation.html", {"form": form})
+    return render(request, "product_creation.html", {"form": form})
+
+
+@login_required(login_url="login")
+def edit_product(request: HttpRequest, id: uuid.UUID):
+    product = Product.objects.get(pk=id)
+
+    form = ProductCreationForm(request.POST or None, instance=product)
+
+    if form.is_valid() and product.creator == request.user and request.method == "POST":
+        form.save()
+        return HttpResponseRedirect(reverse("all_recipes"))
+
+    return render(request, "product_creation.html", {"form": form})
+
+
+@login_required(login_url="login")
+def delete_product(request: HttpRequest, id=uuid.UUID):
+    product = Product.objects.get(pk=id)
+
+    if product.creator == request.user:
+        product.delete()
+
+    return redirect("all_recipes")
 
 
 # fetch all products in json
