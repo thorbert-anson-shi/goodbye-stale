@@ -1,6 +1,6 @@
 # goodbye-stale
 
-## Tugas Individu 2 dan 3 untuk mata kuliah Pemrograman Berbasis Platform Semester Gasal 2024/2025
+## Tugas Individu 2 - 5 untuk mata kuliah Pemrograman Berbasis Platform Semester Gasal 2024/2025
 
 <hr>
 
@@ -682,4 +682,59 @@ def login_user(request: HttpRequest):
     # ...
 ```
 
-<code>all*recipes</code> yang mengakses \_cookie*
+## Tugas 5
+### Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+Secara garis besar, apabila satu element mendapatkan conflict saat styling, prioritas styling dari prioritas paling tinggi hingga paling rendah adalah sebagai berikut:
+1. Element dengan modifier <code>!important</code>
+2. Element yang di-styling secara inline dengan attribute <code>style</code>
+3. Element yang di-styling menggunakan stylesheet dengan identifier id
+4. Element yang di-styling menggunakan stylesheet dengan identifier class
+5. Element yang di-styling menggunakan stylesheet dengan identifier element
+
+Apabila terdapat edge case dimana satu element di-styling menggunakan stylesheet dengan identifier yang sama, maka style yang didefinisikan lebih awal akan diabaikan.
+
+### Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design!
+Responsive design penting karena pengalaman pengguna saat menggunakan perangkat dengan ukuran layar berbeda pasti akan berbeda juga, dan konten yang dibuat untuk layar komputer belum tentu bisa diakses dengan mudah menggunakan touchscreen pada smartphone.
+
+Terlebih lagi, styling yang kurang hati-hati dapat membuat sebuah aplikasi yang dapat digunakan pada desktop menjadi tidak dapat diakses dan digunakan pada layar smartphone.
+
+Solusi untuk masalah ini bisa saja membuat website yang sama untuk ukuran mobile, atau memodifikasi styling website yang sudah ada untuk mengakomodasi berbagai ukuran layar perangkat yang ada.
+
+Beberapa website tua yang dibangun sebelum dipopulerkannya desain responsif masih belum dapat mengakomodasi pengguna yang menggunakan smartphone. Salah satu contoh website ini meliputi SIAK-NG. Saat dibuka pada smartphone, layoutnya masih sama persis dengan layout pada desktop, sehingga pengguna terpaksa untuk zoom in supaya tidak menekan tombol yang salah.
+
+Banyak website modern sudah menerapkan layout responsif, seperti website Apple, Shopee, NASA, dll. Terlihat jelas bahwa website-website tersebut memiliki desain yang berbeda tergantung perangkat yang digunakan untuk mengaksesnya.
+
+### Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+Margin, padding, dan border mendefinisikan atribut atribut suatu elemen yang berhubungan dengan spacing.
+
+Margin adalah ruang kosong antara satu elemen dengan elemen lain. Ia dapat digunakan pada suatu elemen untuk mengatur jarak dari batas luar elemen tersebut dengan batas luar dari elemen lainny.
+
+Padding adalah ruang kosong antara batas luar elemen dengan konten dari elemen tersebut. Padding didefinisikan pada parent container untuk mendefinisikan jarak dari dinding container ke child element terdekat.
+
+Terakhir, border merupakan ketebalan dari dinding elemen tersebut, dan dapat diatur dengan langsung menambahkan atribut border bersama dengan detail border ke stylesheet suatu elemen.
+
+Dengan tailwindcss, pendefinisian ketiga property ini menjadi jauh lebih mudah, dengan hanya menambahkan p-x, m-x, atau border-x untuk menambahkan padding, margin, atau border dengan ketebalan x.
+
+### Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+Flex box adalah sejenis container, dimana ukuran dan layout dari elemen kontainer tersebut didefinisikan pada container tersebut. Sebagai contoh, pada suatu flex box dengan <code>flow-direction: column</code>, yakni bahwa elemen dalam flex box akan disusun dari atas ke bawah, kita dapat mendefinisikan bahwa elemen akan diratakan pada sisi kanan menggunakan atribut <code>align-items: end</code> pada container flex box.
+
+Grid merupakan sistem layout dimana website dibagi menjadi serangkaian baris dan kolom, dan setiap elemen yang ditaruh dalam layout tersebut memiliki panjang dan lebar yang mengacu pada ukuran grid.
+
+Kedua jenis layout ini memudahkan proses desain responsif. Flexbox memudahkan pengguna untuk mengatur layout serangkaian objek dengan mudah, sementara grid dapat digunakan untuk memastikan bahwa sebuah elemen memakan tempat yang sama secara proporsional untuk setiap ukuran layar.
+
+### Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+Untuk menambahman fungsi edit dan delete pada aplikasi, saya membuat dua view yang menggunakan decorator <code>@login_required</code> untuk memastikan bahwa hanya user yang logged in yang dapat memodifikasi suatu produk. Pada template, saya menggunakan conditional rendering untuk memastikan kalau hanya user yang membuat produk yang dapat mengedit dan menghapus produk tersebut. Untuk mencegah IDOR, saya juga melakukan backend check pada views untuk memastikan request datang dari user yang sama.
+
+Saya sudah mulai melakukan styling dari Tugas 2. Saya menggunakan tailwindcss yang merupakan serangkaian utility classes yang berperan untuk menambahkan style-style tertentu dengan menambahkannya secara inline dalam classlist suatu elemen.
+
+Untuk memastikan kalau desain website saya tetap responsif, saya melakukan styling seperti biasa untuk layout berukuran layar smartphone, lalu menggunakan breakpoint <code>md</code> untuk mendefinisikan style suatu elemen saat dibuka di layar berukuran desktop.
+
+Untuk menambahkan detail-detail yang diminta pada soal, saya menambahkan conditional rendering Django Template pada template main.html untuk memastikan kalau suatu placeholder message ditunjukkan apabila tidak terdapat produk pada database.
+
+Hal ini juga saya lakukan untuk menunjukkan produk-produk yang dijual apabila database sudah terisi.
+
+Pada setiap card, saya menambahkan 2 button untuk mengedit dan menghapus produk, namun saya menambahkan conditional check juga untuk memastikan kalau hanya user yang membuat produk tersebut yang dapat memodifikasi produk tersebut. Kedua button ini saya hubungkan dengan view edit_product dan delete_product untuk menjalankan view function yang bersangkutan saat ditekan.
+
+Terakhir, saya membuat navbar pada layar mobile dengan menambahkan elemen \<nav\> pada awal main.html. Kemudian, saya menaruh link-link yang diminta dan melakukan centering dengan mengatur atribut justify dan align-items dari nav yang dibuat menjadi sebuah flex box. Kemudian, untuk membuat desain ini responsif, saya menambahkan beberapa breakpoint md untuk mendefinisikan styling yang berubah apabila layar lebih besar dari 768px.
+
+Dengan menambahkan sedikit kode JavaScript untuk mendeteksi dan menghandle interaksi pengguna, saya membuat navbar mobile untuk muncul saat hamburger button ditekan, dan hilang kembali saat hamburger button ditekan kembali.
