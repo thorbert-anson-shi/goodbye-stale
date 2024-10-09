@@ -802,6 +802,10 @@ Selama masa menunggu ini, sebuah fungsi <code>async</code> seperti <code>fetch()
 
 Apabila kita tidak menggunakan keyword <code>await</code>, maka fungsi <code>fetch()</code> hanya akan mengembalikan objek <code>Promise</code> ini, yang belum tentu berisi informasi yang ingin kita akses.
 
+### Mengapa kita perlu menggunakan decorator csrf_exempt pada view yang akan digunakan untuk AJAX POST?
+
+Jujur saja, saya kurang mengerti alasan dibalik penggunaan decorator csrf_exempt pada view dengan AJAX POST. Dari informasi yang saya temukan, decorator csrf_exempt biasanya hanya digunakan untuk testing, karena penggunaan CSRF token cukup esensial untuk mencegah terjadinya serangan CSRF. Oleh karena itu, saya masih menggunakan token CSRF pada tugas saya kali ini.
+
 ### Pada tutorial PBP minggu ini, pembersihan data input pengguna dilakukan di belakang (backend) juga. Mengapa hal tersebut tidak dilakukan di frontend saja?
 
 Pada suatu sistem dimana data input pengguna hanya dibersihkan di frontend, seorang pengguna yang tidak berwenang dapat membuat <code>request</code> tanpa berinteraksi dengan frontend.
@@ -959,3 +963,35 @@ creationForm.addEventListener("submit", (event) => {
   }
 });
 ```
+
+> Perhatikan kalau dalam form ini saya juga melakukan validasi kebenaran input JSON pada field "ingredients" saya. Hal ini bisa dilakukan pada frontend untuk membuat feedback lebih responsif dan mengurangi banyaknya komputasi yang diperlukan pada backend.
+
+Kemudian, data yang diberikan pada view function akan diproses lebih lanjut pada sisi backend untuk mencegah terjadinya serangan XSS. Serangan XSS dicegah dengan memastikan kalau terdapat kurung tajam pada request, kurung tersebut dibuang dan tidak dianggap sebagai bagian dari request.
+
+```python
+from django.utils.html import strip_tags
+
+@csrf_protect
+@require_POST
+def create_product_ajax(request: HttpRequest):
+    name = strip_tags(request.POST.get("name"))
+    price = strip_tags(request.POST.get("price"))
+    description = strip_tags(request.POST.get("description"))
+    # parse JSON before storing in database
+    ingredients = json.loads(strip_tags(request.POST.get("ingredients")))
+    category = strip_tags(request.POST.get("category"))
+
+    new_product = Product(
+        name=name,
+        price=price,
+        description=description,
+        ingredients=ingredients,
+        category=category,
+        creator=request.user,
+    )
+    new_product.save()
+
+    return HttpResponse("Created", status=201)
+```
+
+Sekian pengerjaan saya untuk Tugas Individu 6 PBP. Karena ini merupakan Tugas Individu terakhir, maka saya akan membuat branch terpisah untuk melanjutkan pengerjaan saya terlepas dari kegiatan kuliah PBP.
