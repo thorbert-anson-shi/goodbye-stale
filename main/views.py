@@ -1,4 +1,5 @@
 import datetime
+import json
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.utils.html import strip_tags
 from django.core import serializers
@@ -7,9 +8,9 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
-from .forms import ProductCreationForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
+from .forms import ProductCreationForm
 from .models import *
 
 
@@ -96,12 +97,14 @@ def create_product(request: HttpRequest):
     return render(request, "product_creation.html", {"form": form})
 
 
+@csrf_protect
 @require_POST
 def create_product_ajax(request: HttpRequest):
     name = strip_tags(request.POST.get("name"))
     price = strip_tags(request.POST.get("price"))
     description = strip_tags(request.POST.get("description"))
-    ingredients = strip_tags(request.POST.get("ingredients"))
+    # parse JSON before storing in database
+    ingredients = json.loads(strip_tags(request.POST.get("ingredients")))
     category = strip_tags(request.POST.get("category"))
 
     new_product = Product(

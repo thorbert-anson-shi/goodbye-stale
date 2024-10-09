@@ -702,7 +702,7 @@ def all_recipes(request: HttpRequest):
 
 > Note: _Conditional statement_ pada attribute "last_login" dibutuhkan untuk memastikan tidak terjadi KeyError saat user tidak logged-in, dan field "last_login" mencoba mengakses objek <code>request.COOKIES["last_login"]</code> yang tidak ada.
 
-## Tugas 5
+## Tugas Individu 5
 
 ### Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
 
@@ -765,3 +765,197 @@ Pada setiap card, saya menambahkan 2 button untuk mengedit dan menghapus produk,
 Terakhir, saya membuat navbar pada layar mobile dengan menambahkan elemen \<nav\> pada awal main.html. Kemudian, saya menaruh link-link yang diminta dan melakukan centering dengan mengatur atribut justify dan align-items dari nav yang dibuat menjadi sebuah flex box. Kemudian, untuk membuat desain ini responsif, saya menambahkan beberapa breakpoint md untuk mendefinisikan styling yang berubah apabila layar lebih besar dari 768px.
 
 Dengan menambahkan sedikit kode JavaScript untuk mendeteksi dan menghandle interaksi pengguna, saya membuat navbar mobile untuk muncul saat hamburger button ditekan, dan hilang kembali saat hamburger button ditekan kembali.
+
+## Tugas Individu 6
+
+### Jelaskan manfaat dari penggunaan JavaScript dalam pengembangan aplikasi web!
+
+JavaScript (JS) adalah bahasa scripting yang biasa digunakan dalam web development untuk melakukan serangkaian aksi pada frontend and backend aplikasi web.
+
+Pada frontend, JS dapat digunakan untuk melakukan event handling, yakni mendeteksi suatu event yang terjadi pada aplikasi web, lalu menjalankan aksi tertentu berdasarkan event apa yang dideteksi. Hal ini memungkinkan aplikasi yang dibangun dengan JS untuk bersifat interaktif dan responsif terhadap aksi pengguna.
+
+Pada backend, JS dapat digunakan sebagai web server, seperti yang bisa kita lihat pada framework web seperti <a href="https://expressjs.com/">Express.js</a>. Pada backend, JS berperan untuk memproses request dan menyajikan data kepada pengguna aplikasi.
+
+Secara garis besar, JS digunakan pada suatu aplikasi web saat HTML memerlukan interaktivitas dan kemampuan untuk mengelola data dinamis yang ditampilkan kepada user.
+
+### Jelaskan fungsi dari penggunaan await ketika kita menggunakan fetch()! Apa yang akan terjadi jika kita tidak menggunakan await?
+
+<code>fetch()</code> adalah sebuah fungsi asinkronus (<code>async</code>) yang melakukan fetching terhadap resource yang terletak pada suatu endpoint. Untuk mempertahankan responsivitas, suatu fungsi <code>async</code> bersifat _non-blocking_, yakni ia tidak akan mencegah berjalannya proses utama pada sisi klien.
+
+Sebuah fungsi <code>async</code> melakukan hal ini dengan melakukan fetching data, lalu menghentikan eksekusi fungsi hingga hasil dari fungsi ini di-_resolve_. Pada fungsi yang didenotasikan dengan keyword <code>async</code>, kita dapat menggunakan keyword <code>await</code> seperti pada contoh berikut:
+
+```javascript
+function func() {
+    const resolved = await asyncFunction();
+}
+```
+
+Berdasarkan contoh ini, keyword <code>await</code> memiliki makna semantik sebagai berikut:
+
+> Eksekusikan fungsi <code>asyncFunction</code>, dan hentikan eksekusi kode pada fungsi <code>func</code>. Setelah fungsi <code>asyncFunction</code> sudah mengembalikan suatu nilai, assign nilai tersebut ke <code>resolved</code>, lalu lanjutkan eksekusi fungsi <code>func()</code>.
+
+Sebenarnya, keyword <code>await</code> merupakan sebuah _convenience_ keyword yang menggantikan penggunaan sintaks resolusi <code>Promise</code> menggunakan <code>.then().catch()</code>. Dengan penggunaan keyword <code>await</code> kita dapat menyederhanakan sintaks resolusi <code>Promise</code> supaya dapat lebih mudah dibaca.
+
+Saat menggunakan fungsi <code>fetch()</code>, kita membuat sebuah <code>request</code> kepada server, lalu dengan keyword <code>await</code>, kita menunggu hingga server mengembalikan sebuah <code>response</code>.
+
+Selama masa menunggu ini, sebuah fungsi <code>async</code> seperti <code>fetch()</code> akan mengembalikan suatu objek <code>Promise</code> yang berisi status dari panggilan <code>async</code> tersebut.
+
+Apabila kita tidak menggunakan keyword <code>await</code>, maka fungsi <code>fetch()</code> hanya akan mengembalikan objek <code>Promise</code> ini, yang belum tentu berisi informasi yang ingin kita akses.
+
+### Pada tutorial PBP minggu ini, pembersihan data input pengguna dilakukan di belakang (backend) juga. Mengapa hal tersebut tidak dilakukan di frontend saja?
+
+Pada suatu sistem dimana data input pengguna hanya dibersihkan di frontend, seorang pengguna yang tidak berwenang dapat membuat <code>request</code> tanpa berinteraksi dengan frontend.
+
+Apabila request semacam ini dikirim, maka semua tindak pembersihan yang kita terapkan pada frontend dapat diabaikan, dan data pengguna invalid ini akan tetap lewat ke backend.
+
+Apabila kita melihat pada suatu model hierarkis, sisi backend memiliki prioritias keamanan lebih tinggi dibandingkan frontend, karena ia terletak lebih dekat dengan _business logic_ dan data yang kita simpan pada database. Oleh karena itu, kita tidak bisa mengabaikan validasi dan pembersihan data yang akan berinteraksi langsung dengan database.
+
+Tentu saja, kita dapat juga melakukan validasi data sederhana pada bagian frontend, seperti validasi tipe data, validasi format, dan beberapa validasi lain yang dapat dilakukan untuk memudahkan proses pembersihan data pada backend.
+
+### Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+
+Untuk mengonversikan data fetching sinkronus menjadi asinkronus, saya pertama mengubah view function <code>show_products_json(request)</code> saya sebagai berikut supaya objek yang di-fetch hanya merupakan objek yang telah dibuat oleh user yang logged-in:
+
+```python
+# fetch all products in json
+def fetch_products_json(request: HttpRequest):
+    queryset = Product.objects.filter(creator=request.user)
+
+    return HttpResponse(
+        serializers.serialize("json", queryset),content_type="application/json"
+    )
+```
+
+View function ini sekarang akan mengembalikan sebuah <code>list</code> berisi semua produk yang memiliki <code>creator == request.user</code>.
+
+Sebetulnya, fetching produk yang dibuat seorang user dapat dilakukan juga pada view function <code>all_recipes</code>. Tapi, hal ini berarti bahwa halaman akan di-load berulang kali setiap kali terjadi update pada database.
+
+Dengan menggunakan view function yang terpisah, kita meng-assign function ini tugas data fetching, sementara function <code>all_recipes</code> hanya perlu menghandle rendering halaman utama. Dengan ini kita bisa memperbarui data user tanpa harus melakukan reload pada keseluruhan halaman.
+
+Untuk mengambil objek-objek <code>Product</code> yang ada pada database, saya membuat <code>async</code> function berikut:
+
+```javascript
+async function getProducts() {
+  return fetch("{% url 'fetch_products_json' %}").then((res) => res.json());
+}
+```
+
+Lalu, dengan setiap pemanggilan function <code>create_product_ajax</code>, saya juga memanggil kembali function <code>getProducts()</code> untuk menngupdate list product yang ada pada database.
+
+Untuk mengimplementasikan AJAX POST request, saya membuat form pada halaman utama yang terletak pada suatu modal. Modal ini saya buat menggunakan sebuah HTML semantic tag yang bernama <code>\<dialog\></code>. Dengan menggunakan elemen <code>dialog</code>, saya tidak perlu mengutak-atik style suatu komponen dengan eksplisit. Untuk menutup atau membuka dialog ini, saya hanya perlu memanggil fungsi seperti berikut:
+
+```javascript
+// Untuk membuka modal
+document.getElementById("open-creation-modal").addEventListener("click", () => {
+  document.getElementById("creation-modal").showModal();
+});
+
+// Untuk menutup modal
+document.getElementById("creation-modal").close();
+```
+
+Pada modal ini, saya menaruh sebuah form yang berisi semua atribut yang diperlukan untuk membuat suatu <code>Product</code>.
+
+```javascript
+<form
+    id="product-creation-form"
+    action="{% url 'create_product_ajax' %}"
+    class="flex flex-col justify-between space-y-5 h-full"
+>
+    <input
+    type="text"
+    name="name"
+    placeholder="Product name"
+    class="p-2 border-2 border-black focus:outline-none"
+    required
+    />
+    <input
+    type="number"
+    name="price"
+    placeholder="Price"
+    class="p-2 border-2 border-black focus:outline-none"
+    required
+    />
+    <textarea
+    name="description"
+    placeholder="Description"
+    value=""
+    class="p-2 h-full resize-none overflow-scroll border-2 border-black focus:outline-none"
+    required
+    ></textarea>
+    <textarea
+    id="ingredients-input"
+    name="ingredients"
+    placeholder="{'ingredient' : 'quantity'}"
+    class="p-2 h-full resize-none overflow-scroll border-2 border-black focus:outline-none"
+    required
+    ></textarea>
+    <select name="category">
+        {% for category in product_categories %}
+        <option value="category">{{category.1}}</option>
+        {% endfor %}
+    </select>
+    <div
+    id="btn-group"
+    class="flex flex-row justify-between space-x-3 *:flex-grow *:p-3 *:border-2 *:border-black"
+    >
+    <button
+        id="close-modal"
+        type="submit"
+        class="bg-white hover:bg-green-500"
+    >
+        Submit
+    </button>
+    <button
+        id="cancel-submission"
+        type="button"
+        onclick="{
+        // Empty form after cancellation
+        document.getElementById('product-creation-form').reset();
+        document.getElementById('creation-modal').close();
+        }"
+        class="bg-white hover:bg-red-500"
+    >
+        Cancel
+    </button>
+    </div>
+</form>
+```
+
+Form ini saya pasangkan pada modal, lalu saya pasangkan suatu <code>EventListener</code> yang akan mendeteksi saat form dikumpulkan. Setelah dikumpulkan, form akan menjalankan kode berikut:
+
+```javascript
+const creationForm = document.getElementById("product-creation-form");
+creationForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  try {
+    var dirtyInput = creationForm.querySelector(
+      "textarea[name='ingredients']"
+    ).value;
+
+    // To make sure user input is valid, else throw error
+    JSON.parse(dirtyInput);
+
+    fetch(creationForm.action, {
+      method: "POST",
+      body: new FormData(creationForm),
+    })
+      .then((data) => {
+        refreshProducts();
+        document.getElementById("creation-modal").close();
+        alert("Your product has been created successfully!");
+      })
+      .catch((error) => {
+        alert(error);
+        console.log(error);
+      });
+
+    // Empty creationForm after submission
+    creationForm.reset();
+  } catch (error) {
+    alert("Your ingredients are not in a valid JSON format!");
+    return;
+  }
+});
+```

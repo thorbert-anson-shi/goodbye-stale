@@ -157,7 +157,6 @@
         id="ingredients-input"
         name="ingredients"
         placeholder="{'ingredient' : 'quantity'}"
-        value=""
         class="p-2 h-full resize-none overflow-scroll border-2 border-black focus:outline-none"
         required
       ></textarea>
@@ -260,6 +259,7 @@
         "textarea[name='ingredients']"
       ).value;
 
+      // To make sure user input is valid, else throw error
       JSON.parse(dirtyInput);
 
       fetch(creationForm.action, {
