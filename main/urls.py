@@ -8,6 +8,7 @@ urlpatterns = [
     path("login/", login_user, name="login"),
     path("logout/", logout_user, name="logout"),
     path("create_product/", create_product, name="create_product"),
+    path("create_product_ajax/", create_product_ajax, name="create_product_ajax"),
     path("edit_product/<uuid:id>", edit_product, name="edit_product"),
     path("delete_product/<uuid:id>", delete_product, name="delete_product"),
     path("add_suggestion/", add_suggestion, name="add_suggestion"),

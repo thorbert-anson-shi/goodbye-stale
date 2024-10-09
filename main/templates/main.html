@@ -27,7 +27,7 @@
       </svg>
     </button>
 
-    {% if recipes %}
+    {% if not empty %}
     <h1 class="font-bold md:text-3xl text-xl text-left">Goodbye::Stale</h1>
     {% endif %}
 
@@ -85,78 +85,13 @@
   >
     <div
       id="items-container"
-      class="flex flex-col items-center m-5 justify-center bg-white h-full w-full z-20 p-3 border-2 border-black md:duration-500 hover:-translate-x-2 hover:-translate-y-2 hover:drop-shadow-[1rem_1rem_rgba(0,0,0,1)]"
-    >
-      {% if recipes %}
-      <h1 class="text-left text-3xl font-bold ml-5 mb-5 self-start">
-        {% if user.is_authenticated %} What do you feel like getting, {{user}}?
-        {% else %} Our not so stale recipes {% endif %}
-      </h1>
-      {% endif %}
-      <div
-        id="carousel"
-        class="flex flex-row overflow-x-scroll overflow-y-hidden w-full"
-      >
-        {% for item in recipes %}
-        <div
-          class="w-1/2 h-full flex flex-col border-2 border-black p-5 overflow-scroll shrink-0 mx-2"
-        >
-          <div
-            class="bg-white p-5 flex flex-row mb-3 justify-between items-center"
-          >
-            <div class="w-1/2">
-              <h1 class="font-bold text-2xl">{{item.name}}</h1>
-              <p class="text-lg">by {{item.creator}}</p>
-            </div>
-            <h2 class="text-right w-1/2">Rp {{item.price}}</h2>
-          </div>
-          <details class="px-5 space-y-2 mb-10" open>
-            <div>
-              <h2 class="font-bold">Description</h2>
-              <h2>{{item.description}}</h2>
-            </div>
-            <div>
-              <h1 class="font-bold">Ingredients</h1>
-              <ul class="list-disc pl-5">
-                {% for ingredient, quantity in item.ingredients.items %}
-                <li>{{ingredient}}: {{quantity}}</li>
-                {% endfor %}
-              </ul>
-            </div>
-          </details>
-          {% if user.is_authenticated and item.creator == user %}
-          <div
-            id="modify-product"
-            class="flex flex-row justify-center text-center space-x-3 mt-auto"
-          >
-            <a
-              href="{% url 'edit_product' item.id %}"
-              class="border-2 border-black p-3 hover:bg-neutral-300 flex-grow"
-              >Edit</a
-            >
-            <a
-              href="{% url 'delete_product' item.id %}"
-              class="border-2 border-black p-3 hover:bg-red-500 flex-grow"
-              >Delete</a
-            >
-          </div>
-          {% endif %}
-        </div>
-        {% empty %}
-        <div id="no-recipes-text" class="text-right w-full space-y-5">
-          <h1 class="text-5xl font-bold">Goodbye::Stale</h1>
-          <h1 class="text-3xl font-bold">
-            We're cooking up something not stale! Please bear with us for a bit!
-          </h1>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
+      class="flex flex-col md:flex-row overflow-scroll items-center m-5 bg-white h-full w-full z-20 p-3 border-2 border-black md:duration-500 hover:-translate-x-2 hover:-translate-y-2 hover:drop-shadow-[1rem_1rem_rgba(0,0,0,1)]"
+    ></div>
     {% if user %}
     <div
       class="-z-30 border-2 border-black p-8 bg-white absolute top-[60vh] left-[24vw] md:duration-500 hover:-translate-x-[12rem]"
     >
-      <a target="_blank" href="{% url 'create_product' %}"
+      <a id="open-creation-modal" class="cursor-pointer"
         >Psst... you wanna<br />
         <u> create a product?</u></a
       >
@@ -169,7 +104,7 @@
   >
     <button
       class="md:p-5 p-2 font-bold bg-white md:text-2xl text-md md:duration-500 hover:-translate-x-2 hover:drop-shadow-[0.5rem_0.5rem_rgba(0,0,0,1)] border-2 border-black"
-      id="open-modal"
+      id="open-suggestion-modal"
     >
       Give us suggestions!
     </button>
@@ -186,12 +121,85 @@
     </button>
   </div>
 </div>
-<dialog id="modal">
+<dialog id="creation-modal">
+  <div
+    class="flex flex-col border-2 border-black p-8 bg-white text-xl fixed w-1/2 h-2/3 bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2"
+  >
+    <h1 class="font-bold text-2xl">Create a recipe</h1>
+    <form
+      id="product-creation-form"
+      action="{% url 'create_product_ajax' %}"
+      class="flex flex-col justify-between space-y-5 h-full"
+    >
+      {% csrf_token %}
+      <input
+        type="text"
+        name="name"
+        placeholder="Product name"
+        class="p-2 border-2 border-black focus:outline-none"
+        required
+      />
+      <input
+        type="number"
+        name="price"
+        placeholder="Price"
+        class="p-2 border-2 border-black focus:outline-none"
+        required
+      />
+      <textarea
+        name="description"
+        placeholder="Description"
+        value=""
+        class="p-2 h-full resize-none overflow-scroll border-2 border-black focus:outline-none"
+        required
+      ></textarea>
+      <textarea
+        id="ingredients-input"
+        name="ingredients"
+        placeholder="{'ingredient' : 'quantity'}"
+        value=""
+        class="p-2 h-full resize-none overflow-scroll border-2 border-black focus:outline-none"
+        required
+      ></textarea>
+      <select name="category">
+        {% for category in product_categories %}
+        <option value="category">{{category.1}}</option>
+        {% endfor %}
+      </select>
+      <div
+        id="btn-group"
+        class="flex flex-row justify-between space-x-3 *:flex-grow *:p-3 *:border-2 *:border-black"
+      >
+        <button
+          id="close-modal"
+          type="submit"
+          class="bg-white hover:bg-green-500"
+        >
+          Submit
+        </button>
+        <button
+          id="cancel-submission"
+          type="button"
+          onclick="{
+            // Empty form after cancellation
+            document.getElementById('product-creation-form').reset();
+            document.getElementById('creation-modal').close();
+          }"
+          class="bg-white hover:bg-red-500"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+<dialog id="suggestion-modal">
   <div
     class="flex flex-col border-2 border-black p-8 bg-white text-xl fixed w-1/2 h-1/2 bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2"
   >
     <h1 class="font-bold text-2xl">Suggest a recipe</h1>
     <form
+      id="suggestion-form"
       action="{% url 'add_suggestion' %}"
       method="post"
       class="flex flex-col justify-between space-y-5 h-full"
@@ -226,7 +234,7 @@
           onclick="{
             // Empty form after cancellation
             document.querySelector('form').reset();
-            document.getElementById('modal').close();
+            document.getElementById('suggestion-modal').close();
           }"
           class="bg-white hover:bg-red-500"
         >
@@ -237,11 +245,52 @@
   </div>
 </dialog>
 <script>
-  document.getElementById("open-modal").addEventListener("click", () => {
-    document.getElementById("modal").showModal();
+  document
+    .getElementById("open-creation-modal")
+    .addEventListener("click", () => {
+      document.getElementById("creation-modal").showModal();
+    });
+
+  const creationForm = document.getElementById("product-creation-form");
+  creationForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    try {
+      var dirtyInput = creationForm.querySelector(
+        "textarea[name='ingredients']"
+      ).value;
+
+      JSON.parse(dirtyInput);
+
+      fetch(creationForm.action, {
+        method: "POST",
+        body: new FormData(creationForm),
+      })
+        .then((data) => {
+          refreshProducts();
+          document.getElementById("creation-modal").close();
+          alert("Your product has been created successfully!");
+        })
+        .catch((error) => {
+          alert(error);
+          console.log(error);
+        });
+
+      // Empty creationForm after submission
+      creationForm.reset();
+    } catch (error) {
+      alert("Your ingredients are not in a valid JSON format!");
+      return;
+    }
   });
 
-  const form = document.querySelector("form");
+  document
+    .getElementById("open-suggestion-modal")
+    .addEventListener("click", () => {
+      document.getElementById("suggestion-modal").showModal();
+    });
+
+  const form = document.getElementById("suggestion-form");
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     fetch(form.action, {
@@ -249,7 +298,7 @@
       body: new FormData(form),
     })
       .then((data) => {
-        document.querySelector("dialog").close();
+        document.getElementById("suggestion-modal").close();
         alert("Your suggestion has been received!");
       })
       .catch((error) => {
@@ -265,5 +314,87 @@
     const menu = document.getElementById("navbar-mobile");
     menu.classList.toggle("hidden");
   });
+
+  var container = document.getElementById("items-container");
+
+  async function getProducts() {
+    return fetch("{% url 'fetch_products_json' %}").then((res) => res.json());
+  }
+
+  async function refreshProducts() {
+    container.innerHTML = "";
+    var productsJson = await getProducts();
+
+    if (productsJson.length == 0) {
+      container.innerHTML = `
+      <div id="no-recipes-text" class="text-right w-[90%] space-y-5">
+        <h1 class="text-5xl font-bold">Goodbye::Stale</h1>
+        <h1 class="text-3xl font-bold">
+          We're cooking up something not stale!<br /> Please bear with us for a bit!
+        </h1>
+      </div>
+      `;
+    } else {
+      productsJson.forEach((product) => {
+        container.innerHTML += `
+        <div
+          class="w-1/2 h-full flex flex-col border-2 border-black p-5 overflow-scroll shrink-0 mx-2"
+        >
+          <div
+            class="bg-white p-5 flex flex-row mb-3 justify-between items-center"
+          >
+            <div class="w-1/2">
+              <h1 class="font-bold text-2xl">${product.fields.name}</h1>
+              <p class="text-lg">by you</p>
+            </div>
+            <h2 class="text-right w-1/2">Rp ${product.fields.price}</h2>
+          </div>
+          <details class="px-5 space-y-2 mb-10" open>
+            <div>
+              <h2 class="font-bold">Description</h2>
+              <h2>${product.fields.description}</h2>
+            </div>
+            <div>
+              <h1 class="font-bold">Ingredients</h1>
+              <ul class="list-disc pl-5">
+                ${Object.entries(product.fields.ingredients)
+                  .map(
+                    ([ingredient, quantity]) =>
+                      `<li>${ingredient}: ${quantity}</li>`
+                  )
+                  .join("")}
+              </ul>
+            </div>
+          </details>
+          <div
+            id="modify-product"
+            class="flex flex-row justify-center text-center space-x-3 mt-auto"
+          >
+            <a
+              onclick="handleEditProduct('${product.pk}')"
+              class="border-2 border-black p-3 hover:bg-neutral-300 flex-grow cursor-pointer"
+              >Edit</a
+            >
+            <a
+              onclick="handleDeleteProduct('${product.pk}')"
+              class="border-2 border-black p-3 hover:bg-red-500 flex-grow cursor-pointer"
+              >Delete</a
+            >
+          </div>
+        </div>
+        `;
+      });
+    }
+  }
+
+  async function handleDeleteProduct(id) {
+    fetch(`/delete_product/${id}`).then((res) => refreshProducts());
+  }
+
+  async function handleEditProduct(id) {
+    window.location.replace(`/edit_product/${id}`);
+  }
+
+  refreshProducts();
 </script>
 {% endblock content %}

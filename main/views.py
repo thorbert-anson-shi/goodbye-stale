@@ -1,5 +1,6 @@
 import datetime
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.utils.html import strip_tags
 from django.core import serializers
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
@@ -48,12 +49,16 @@ def logout_user(request: HttpRequest):
     return response
 
 
+@login_required(login_url="login")
 def all_recipes(request: HttpRequest):
-    recipes = Product.objects.all()
-    recipe_list = [recipe for recipe in recipes]
+    if Product.objects.filter(creator=request.user).exists():
+        empty = False
+    else:
+        empty = True
 
     context = {
-        "recipes": recipe_list,
+        "product_categories": Product.Category.choices,
+        "empty": empty,
         "user": request.user or None,
         "last_login": (
             request.COOKIES["last_login"] if "last_login" in request.COOKIES else None
@@ -91,6 +96,27 @@ def create_product(request: HttpRequest):
     return render(request, "product_creation.html", {"form": form})
 
 
+@require_POST
+def create_product_ajax(request: HttpRequest):
+    name = strip_tags(request.POST.get("name"))
+    price = strip_tags(request.POST.get("price"))
+    description = strip_tags(request.POST.get("description"))
+    ingredients = strip_tags(request.POST.get("ingredients"))
+    category = strip_tags(request.POST.get("category"))
+
+    new_product = Product(
+        name=name,
+        price=price,
+        description=description,
+        ingredients=ingredients,
+        category=category,
+        creator=request.user,
+    )
+    new_product.save()
+
+    return HttpResponse("Created", status=201)
+
+
 @login_required(login_url="login")
 def edit_product(request: HttpRequest, id: uuid.UUID):
     product = Product.objects.get(pk=id)
@@ -116,7 +142,8 @@ def delete_product(request: HttpRequest, id=uuid.UUID):
 
 # fetch all products in json
 def fetch_products_json(request: HttpRequest):
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(creator=request.user)
+
     return HttpResponse(
         serializers.serialize("json", queryset), content_type="application/json"
     )
