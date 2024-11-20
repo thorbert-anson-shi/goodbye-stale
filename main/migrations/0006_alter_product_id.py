@@ -5,15 +5,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0005_order_ordereditem'),
+        ("main", "0005_order_ordereditem"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+            model_name="product",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+            ),
         ),
     ]

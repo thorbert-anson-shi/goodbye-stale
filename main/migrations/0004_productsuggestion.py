@@ -4,18 +4,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0003_alter_product_ingredients'),
+        ("main", "0003_alter_product_ingredients"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProductSuggestion',
+            name="ProductSuggestion",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=128)),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=128)),
+                ("description", models.TextField()),
             ],
         ),
     ]

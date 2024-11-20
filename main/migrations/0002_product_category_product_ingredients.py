@@ -4,20 +4,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0001_initial'),
+        ("main", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='category',
-            field=models.CharField(choices=[('CL', 'Classic'), ('FR', 'Fringe'), ('CR', 'Carnivore'), ('VA', 'Vegan'), ('VE', 'Vegetarian')], max_length=2, null=True),
+            model_name="product",
+            name="category",
+            field=models.CharField(
+                choices=[
+                    ("CL", "Classic"),
+                    ("FR", "Fringe"),
+                    ("CR", "Carnivore"),
+                    ("VA", "Vegan"),
+                    ("VE", "Vegetarian"),
+                ],
+                max_length=2,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='product',
-            name='ingredients',
+            model_name="product",
+            name="ingredients",
             field=models.JSONField(default={}),
         ),
     ]
