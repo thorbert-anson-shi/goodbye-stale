@@ -13,7 +13,8 @@ urlpatterns = [
     path("delete_product/<uuid:id>", delete_product, name="delete_product"),
     path("add_suggestion/", add_suggestion, name="add_suggestion"),
     path("create_order/", create_order, name="create_order"),
-    path("json/", fetch_products_json, name="fetch_products_json"),
+    path("json/", fetch_all_products_json, name="fetch_all_products_json"),
+    path("json_per_user/", fetch_products_json, name="fetch_products_json"),
     path("xml/", fetch_products_xml, name="fetch_products_xml"),
     path(
         "json/<str:id>/",

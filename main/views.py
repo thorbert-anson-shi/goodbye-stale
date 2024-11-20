@@ -176,5 +176,13 @@ def fetch_product_xml_by_id(request: HttpRequest, id):
     )
 
 
+def fetch_all_products_json(request: HttpRequest):
+    queryset = Product.objects.all()
+
+    return HttpResponse(
+        serializers.serialize("json", queryset), content_type="application/json"
+    )
+
+
 def create_order(request: HttpRequest):
     return HttpResponse("No response yet")
